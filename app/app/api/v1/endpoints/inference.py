@@ -9,6 +9,7 @@ from core.config import settings
 from data.emotion_vectors import get_emotion_vector_dataset
 from data.lyrics import get_lyrics_dataset
 from schemas.recommendation import SongRecommendation, RecommendationResponse
+from schemas.user_request import UserRequest
 
 router = APIRouter()
 
@@ -16,11 +17,15 @@ emotion_classifier = get_emotion_classifier()
 retriever = get_retriever(type=RetrieverType.CUSTOM)
 
 
-@router.get("/inference/", response_model=RecommendationResponse)
-async def inference() -> Any:
+@router.post("/inference", response_model=RecommendationResponse)
+async def inference(request: UserRequest) -> Any:
     """
     발화 문장을 통하여 사용자의 감정을 분류하고,
     감정 벡터공간과 가사 데이터베이스를 이용하여 사용자의 감정과 연관있는 노래 리스트를 추천한다.
+    :param:
+    UserRequest
+    - user_id: str, 비식별처리된 uuid
+      user_input: str, 사용자가 입력한 발화문장
     :return:
     RecommendationResponse
     - topk: 후보 갯수
@@ -31,7 +36,9 @@ async def inference() -> Any:
           artist: 노래 가수
           song_name : 노래 제목
     """
-    user_input = "요즘 우울하고 힘들어요."
+    print(request.user_input)
+    user_input = request.user_input
+
     # Emotion Analysis
     # emotion_classifier = get_emotion_classifier()
     emotion_classifier.eval()
