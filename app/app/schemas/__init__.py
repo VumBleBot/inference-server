@@ -1,2 +1,2 @@
 from schemas.emotion import Emotion
-from schemas.recommendation import SongRecommendation, RecommendationResponse
+from schemas.recommendation import RecommendationResponse, SongRecommendation

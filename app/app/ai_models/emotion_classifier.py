@@ -5,9 +5,8 @@ from pathlib import Path
 
 import torch
 import torch.nn as nn
-from transformers import AutoModel, BertTokenizerFast
-
 from schemas.emotion import Emotion
+from transformers import AutoModel, BertTokenizerFast
 
 
 class EmotionClassifier(nn.Module):
@@ -38,7 +37,7 @@ class EmotionClassifier(nn.Module):
         assert os.path.exists(label_path), f"{label_path}가 존재하지 않습니다"
         self.idx2label = json.load(open(label_path, "r"))
 
-    def vector_to_label(self, emotion_vector: torch.Tensor) -> int:
+    def vector_to_label(self, emotion_vector: torch.Tensor) -> str:
         """emotion_vector의 label을 출력합니다"""
         idx = self.classifier(emotion_vector).detach().argmax(-1).cpu().item()
         return self.idx2label[str(idx)]

@@ -12,7 +12,6 @@ class RetrieverType(str, Enum):
 
 
 class BaseRetriever:
-
     def __init__(self):
         pass
 
@@ -67,4 +66,3 @@ def get_retriever(type: RetrieverType) -> BaseRetriever:
 #             }
 #         }
 #         res = self.es_obj.search(index=index_name, body=query, size=topk)
-

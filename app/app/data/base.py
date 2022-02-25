@@ -12,4 +12,3 @@ class BaseDataset(metaclass=ABCMeta):
         current_dir = Path(__file__).parent
         asset_dir = os.path.join(current_dir, "assets")
         self.path = os.path.join(asset_dir, self.name)
-

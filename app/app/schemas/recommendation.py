@@ -1,7 +1,6 @@
 from typing import List
 
-from pydantic import BaseModel, BaseConfig, Field
-
+from pydantic import BaseConfig, BaseModel, Field
 from schemas.song import Song
 
 

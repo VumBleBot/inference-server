@@ -1,14 +1,13 @@
 from typing import Any
 
 import numpy as np
-from fastapi import APIRouter
-
 from ai_models.emotion_classifier import get_emotion_classifier
-from ai_models.retriever import get_retriever, RetrieverType
+from ai_models.retriever import RetrieverType, get_retriever
 from core.config import settings
 from data.emotion_vectors import get_emotion_vector_dataset
 from data.lyrics import get_lyrics_dataset
-from schemas.recommendation import SongRecommendation, RecommendationResponse
+from fastapi import APIRouter
+from schemas.recommendation import RecommendationResponse, SongRecommendation
 from schemas.user_request import UserRequest
 
 router = APIRouter()
@@ -62,32 +61,25 @@ async def inference(request: UserRequest) -> Any:
     # sort candidates
     # TODO change cosine similarity by env
     emotion_inner_product = map(lambda x: np.dot(user_emotion.vector, x), candidate_vectors)
-    score_indices, sorted_scores = zip(
-        *sorted(enumerate(emotion_inner_product), key=lambda x: x[1], reverse=True)
-    )
+    score_indices, sorted_scores = zip(*sorted(enumerate(emotion_inner_product), key=lambda x: x[1], reverse=True))
 
     print(f"User Input : {user_input}")
     print(f"Emotion Label of User : {user_emotion.label}")
 
-    response = RecommendationResponse(
-        topk=settings.TOPK,
-        emotion_label=user_emotion.label,
-        contents=[]
-    )
+    response = RecommendationResponse(topk=settings.TOPK, emotion_label=user_emotion.label, contents=[])
 
     for index, score in zip(score_indices, sorted_scores):
         artist = candidate_lyrics["artists"][index]
         song_name = candidate_lyrics["song_name"][index]
 
-        response.contents.append(
-            SongRecommendation(ranking=index, score=score, artist=artist, song_name=song_name)
-        )
+        response.contents.append(SongRecommendation(ranking=index, score=score, artist=artist, song_name=song_name))
 
-    print(f"Recommendation Complete.")
+    print("Recommendation Complete.")
     print(f"Best Recommendation : {response.contents[0].artist} - {response.contents[0].song_name}")
     print(f"Recommendation Score : {response.contents[0].score}")
 
     return response
+
 
 # TODO
 # Health check api after model loading

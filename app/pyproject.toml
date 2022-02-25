@@ -48,3 +48,8 @@ python_version = "3.8"
 warn_return_any = true
 warn_unused_configs = true
 mypy_path = "app"
+exclude = [
+    'assets/',
+    'emotion_analysis/',
+    'lyrics_retrieval'
+]

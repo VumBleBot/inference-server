@@ -1,7 +1,6 @@
 from functools import lru_cache
 
 import numpy as np
-
 from core.config import settings
 from data.base import BaseDataset
 
@@ -23,4 +22,3 @@ class EmotionVectorDataset(BaseDataset):
 @lru_cache
 def get_emotion_vector_dataset() -> EmotionVectorDataset:
     return EmotionVectorDataset()
-

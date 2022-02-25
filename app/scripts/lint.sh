@@ -2,7 +2,7 @@
 
 set -x
 
-mypy app
-black app --check
+black app
 isort app
 flake8
+mypy app --no-warn-return-any
