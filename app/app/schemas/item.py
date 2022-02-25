@@ -1,12 +1,8 @@
 from typing import Optional
 
+import numpy.typing
 from pydantic import BaseModel
 
-
-class ItemBase(BaseModel):
-    title: Optional[str] = None
-    description: Optional[str] = None
-
-
-class Item(ItemBase):
-    pass
+class EmotionVector(BaseModel):
+    label: str
+    vector: numpy.typing.NDArray
