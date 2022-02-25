@@ -17,12 +17,14 @@ class Settings(BaseSettings):
 
     PROJECT_NAME: str
 
+    TOPK: int = 30
+    LYRICS_DATA: str
+    EMOTION_VECTOR_DATA: str
+
     class Config:
         case_sensitive = True
         env_file = str(os.path.join(Path(__file__).parent, f'env/{os.getenv("ENV_STATE", "dev")}.env'))
         env_file_encoding = "utf-8"
 
 
-@lru_cache
-def get_settings() -> Settings:
-    return Settings()
+settings = Settings()
