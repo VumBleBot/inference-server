@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # CUSTOM IT
-IMAGE_NAME="sample-fastapi-project"
-TAG_NAME="1.0"
+IMAGE_NAME="vumblebot"
+TAG_NAME="0.1"
 ENV_STATE="dev"
 
 set -e # stop if error occurs

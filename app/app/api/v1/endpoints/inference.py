@@ -55,7 +55,7 @@ async def inference(request: UserRequest) -> Any:
     candidate_lyrics = lyrics_dataset.dataset[indices]
 
     emotion_vector_dataset = get_emotion_vector_dataset()
-    print(f"LOAD EMOTION VECTOR DATA : [{emotion_vector_dataset.name}")
+    print(f"LOAD EMOTION VECTOR DATA : [{emotion_vector_dataset.name}]")
     candidate_vectors = emotion_vector_dataset.dataset[indices]
 
     # sort candidates
