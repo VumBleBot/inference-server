@@ -61,3 +61,5 @@ COPY ./app /app
 
 # python source root
 ENV PYTHONPATH=/app/app
+
+EXPOSE 80
