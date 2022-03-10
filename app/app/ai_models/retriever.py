@@ -1,20 +1,27 @@
+import logging
 import os
 import pickle
+from abc import ABCMeta, abstractmethod
 from enum import Enum
 from functools import lru_cache
 from pathlib import Path
+from typing import List
 
 import numpy as np
+from elasticsearch import Elasticsearch
 
 
 class RetrieverType(str, Enum):
     CUSTOM = "custom"
+    ES = "elasticsearch"
 
 
-class BaseRetriever:
+class BaseRetriever(metaclass=ABCMeta):
+    @abstractmethod
     def __init__(self):
         pass
 
+    @abstractmethod
     async def get_relevant_doc_bulk(self, query: str, topk: int) -> np.ndarray:
         pass
 
@@ -43,26 +50,35 @@ class CustomRetriever(BaseRetriever):
         return doc_indices
 
 
+class ElasticSearchRetriever(BaseRetriever):
+    es_server: Elasticsearch
+
+    def __init__(self, es_host: str = "localhost", es_port: int = 9200):
+        super().__init__()
+        self.es_server = Elasticsearch(f"http://{es_host}:{es_port}")
+
+    def _get_structured_query(self, user_input) -> dict:
+        query = {"_source": False, "query": {"match": {"document_text": user_input}}}
+        return query
+
+    async def _request_search(self, index_name: str, query: dict, topk: int) -> List[int]:
+        try:
+            result = self.es_server.search(index=index_name, body=query, size=topk)
+            doc_indices = list(hit["_id"] for hit in result["hits"]["hits"])
+        except Exception as e:
+            logging.error(str(e))
+        return doc_indices
+
+    async def get_relevant_doc_bulk(self, query: str, topk: int) -> np.ndarray:
+        structured_query = self._get_structured_query(query)
+        doc_indices = await self._request_search("lyrics", query=structured_query, topk=topk)
+        return np.array(doc_indices)
+
+
 @lru_cache(maxsize=len(RetrieverType))
 def get_retriever(type: RetrieverType) -> BaseRetriever:
     if type == RetrieverType.CUSTOM:
         return CustomRetriever()
+    elif type == RetrieverType.ES:
+        return ElasticSearchRetriever()
     raise NotImplementedError
-
-
-# class ElasticSearchRetriever(BaseRetriever):
-#     es_obj: Elasticsearch
-#
-#     def __init__(self, es_host: str="localhost", es_port: int = 9200):
-#         super().__init__()
-#         self.es_obj = Elasticsearch(f"http://{es_host}:{es_port}")
-#
-#     def get_relevant_doc_bulk(self, query: str, topk: int) -> np.typing.NDArray:
-#         query = {
-#             'query': {
-#                 'match': {
-#                     'document_text': query
-#                 }
-#             }
-#         }
-#         res = self.es_obj.search(index=index_name, body=query, size=topk)

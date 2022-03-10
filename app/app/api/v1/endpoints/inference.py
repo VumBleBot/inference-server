@@ -13,6 +13,7 @@ from schemas.user_request import UserRequest
 router = APIRouter()
 
 emotion_classifier = get_emotion_classifier()
+# TODO use es retriever, then custom retriever if it fails
 retriever = get_retriever(type=RetrieverType.CUSTOM)
 
 
@@ -45,7 +46,6 @@ async def inference(request: UserRequest) -> Any:
 
     # Retrieval
     # TODO Add Retriever type change by env
-    # retriever = get_retriever(type=RetrieverType.CUSTOM)
     # TODO exception handling for retrieval fail
     indices = await retriever.get_relevant_doc_bulk(query=user_input, topk=settings.TOPK)
 
