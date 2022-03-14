@@ -152,3 +152,7 @@ __pycache__
 emotion_analysis/
 lyrics_retrieval/
 assets/
+
+# environment
+.env
+*.env
