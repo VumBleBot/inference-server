@@ -34,7 +34,7 @@ async def inference(request: UserRequest) -> Any:
     - topk: 후보 갯수
       emotion_label: 감정 레이블
       List[SongRecommendation]
-        - ranking: 후보군 중 순위
+        - ranking: 가사 검색 후보군 중 순위
           score: 추천 스코어
           artist: 노래 가수
           song_name : 노래 제목
