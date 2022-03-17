@@ -10,6 +10,8 @@ from typing import List
 import numpy as np
 from elasticsearch import Elasticsearch
 
+from core.config import settings
+
 
 class RetrieverType(str, Enum):
     CUSTOM = "custom"
@@ -58,7 +60,7 @@ class ElasticSearchRetriever(BaseRetriever):
         self.es_server = Elasticsearch(f"http://{es_host}:{es_port}")
 
     def _get_structured_query(self, user_input) -> dict:
-        query = {"_source": False, "query": {"match": {"document_text": user_input}}}
+        query = {"_source": False, "query": {"match": {"context": user_input}}}
         return query
 
     async def _request_search(self, index_name: str, query: dict, topk: int) -> List[int]:
@@ -72,7 +74,7 @@ class ElasticSearchRetriever(BaseRetriever):
     async def get_relevant_doc_bulk(self, query: str, topk: int) -> np.ndarray:
         structured_query = self._get_structured_query(query)
         doc_indices = await self._request_search("lyrics", query=structured_query, topk=topk)
-        return np.array(doc_indices)
+        return np.array(list(map(int, doc_indices)))
 
 
 @lru_cache(maxsize=len(RetrieverType))
@@ -80,5 +82,5 @@ def get_retriever(type: RetrieverType) -> BaseRetriever:
     if type == RetrieverType.CUSTOM:
         return CustomRetriever()
     elif type == RetrieverType.ES:
-        return ElasticSearchRetriever()
+        return ElasticSearchRetriever(es_host=settings.ES_HOST, es_port=settings.ES_PORT)
     raise NotImplementedError

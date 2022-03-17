@@ -14,7 +14,10 @@ router = APIRouter()
 
 emotion_classifier = get_emotion_classifier()
 # TODO use es retriever, then custom retriever if it fails
-retriever = get_retriever(type=RetrieverType.CUSTOM)
+if settings.USE_ES:
+    retriever = get_retriever(type=RetrieverType.ES)
+else:
+    retriever = get_retriever(type=RetrieverType.CUSTOM)
 
 
 @router.post("/inference", response_model=RecommendationResponse)
@@ -40,12 +43,10 @@ async def inference(request: UserRequest) -> Any:
     user_input = request.user_input
 
     # Emotion Analysis
-    # emotion_classifier = get_emotion_classifier()
     emotion_classifier.eval()
     user_emotion = await emotion_classifier.predict(user_input)
 
     # Retrieval
-    # TODO Add Retriever type change by env
     # TODO exception handling for retrieval fail
     indices = await retriever.get_relevant_doc_bulk(query=user_input, topk=settings.TOPK)
 

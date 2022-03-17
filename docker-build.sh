@@ -2,7 +2,7 @@
 
 # CUSTOM IT
 IMAGE_NAME="vumblebot"
-TAG_NAME="0.1"
+TAG_NAME="0.2"
 
 
 set -e # stop if error occurs

@@ -2,7 +2,7 @@
 
 # CUSTOM IT
 IMAGE_NAME="vumblebot"
-TAG_NAME="0.1"
+TAG_NAME="0.2"
 ENV_STATE="dev"
 
 set -e # stop if error occurs

@@ -13,6 +13,9 @@ class Settings(BaseSettings):
     SERVER_NAME: str
     SERVER_HOST: AnyHttpUrl
     SERVER_PORT: int
+    USE_ES: bool = False
+    ES_HOST: str = ""
+    ES_PORT: str = ""
 
     PROJECT_NAME: str
 
