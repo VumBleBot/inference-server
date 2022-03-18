@@ -61,7 +61,10 @@ async def inference(request: UserRequest) -> Any:
 
     # sort candidates
     # TODO change cosine similarity by env
-    emotion_inner_product = map(lambda x: np.dot(user_emotion.vector, x), candidate_vectors)
+
+    cos_sim = lambda a, b: np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+    emotion_inner_product = map(lambda x: cos_sim(user_emotion.vector, x), candidate_vectors)
     score_indices, sorted_scores = zip(*sorted(enumerate(emotion_inner_product), key=lambda x: x[1], reverse=True))
 
     print(f"User Input : {user_input}")
