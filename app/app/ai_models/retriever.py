@@ -8,9 +8,8 @@ from pathlib import Path
 from typing import List
 
 import numpy as np
-from elasticsearch import Elasticsearch
-
 from core.config import settings
+from elasticsearch import Elasticsearch
 
 
 class RetrieverType(str, Enum):
@@ -84,3 +83,10 @@ def get_retriever(type: RetrieverType) -> BaseRetriever:
     elif type == RetrieverType.ES:
         return ElasticSearchRetriever(es_host=settings.ES_HOST, es_port=settings.ES_PORT)
     raise NotImplementedError
+
+
+default_retriever = get_retriever(type=RetrieverType.CUSTOM)
+if settings.USE_ES:
+    retriever = get_retriever(type=RetrieverType.ES)
+else:
+    retriever = default_retriever

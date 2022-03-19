@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     SERVER_PORT: int
     USE_ES: bool = False
     ES_HOST: str = ""
-    ES_PORT: str = ""
+    ES_PORT: int = 9200
 
     PROJECT_NAME: str
 

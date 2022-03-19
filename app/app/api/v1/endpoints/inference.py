@@ -1,8 +1,10 @@
 from typing import Any
 
 import numpy as np
+
+from ai_models.retriever import retriever
 from ai_models.emotion_classifier import get_emotion_classifier
-from ai_models.retriever import RetrieverType, get_retriever
+from ai_models.retriever import default_retriever
 from core.config import settings
 from data.emotion_vectors import get_emotion_vector_dataset
 from data.lyrics import get_lyrics_dataset
@@ -13,11 +15,6 @@ from schemas.user_request import UserRequest
 router = APIRouter()
 
 emotion_classifier = get_emotion_classifier()
-# TODO use es retriever, then custom retriever if it fails
-if settings.USE_ES:
-    retriever = get_retriever(type=RetrieverType.ES)
-else:
-    retriever = get_retriever(type=RetrieverType.CUSTOM)
 
 
 @router.post("/inference", response_model=RecommendationResponse)
@@ -47,8 +44,12 @@ async def inference(request: UserRequest) -> Any:
     user_emotion = await emotion_classifier.predict(user_input)
 
     # Retrieval
-    # TODO exception handling for retrieval fail
-    indices = await retriever.get_relevant_doc_bulk(query=user_input, topk=settings.TOPK)
+    try:
+        indices = await retriever.get_relevant_doc_bulk(query=user_input, topk=settings.TOPK)
+    except ConnectionError as e:
+        # TODO Error logging
+        print(f"Connection Error : {e}")
+        indices = await default_retriever.get_relevant_doc_bulk(query=user_input, topk=settings.TOPK)
 
     # Dataset
     lyrics_dataset = get_lyrics_dataset()
