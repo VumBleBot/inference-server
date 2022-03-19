@@ -1,10 +1,8 @@
 from typing import Any
 
 import numpy as np
-
-from ai_models.retriever import retriever
 from ai_models.emotion_classifier import get_emotion_classifier
-from ai_models.retriever import default_retriever
+from ai_models.retriever import default_retriever, retriever
 from core.config import settings
 from data.emotion_vectors import get_emotion_vector_dataset
 from data.lyrics import get_lyrics_dataset
