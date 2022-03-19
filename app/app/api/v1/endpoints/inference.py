@@ -59,15 +59,17 @@ async def inference(request: UserRequest) -> Any:
     print(f"LOAD EMOTION VECTOR DATA : [{emotion_vector_dataset.name}]")
     candidate_vectors = emotion_vector_dataset.dataset[indices]
 
-    # sort candidates
-    # TODO change cosine similarity by env
-    emotion_inner_product = map(lambda x: np.dot(user_emotion.vector, x), candidate_vectors)
+    cos_sim = lambda a, b: np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+    emotion_inner_product = map(lambda x: cos_sim(user_emotion.vector, x), candidate_vectors)
     score_indices, sorted_scores = zip(*sorted(enumerate(emotion_inner_product), key=lambda x: x[1], reverse=True))
 
     print(f"User Input : {user_input}")
     print(f"Emotion Label of User : {user_emotion.label}")
 
-    response = RecommendationResponse(topk=settings.TOPK, emotion_label=user_emotion.label, contents=[])
+    response = RecommendationResponse(
+        topk=settings.TOPK, emotion_label=user_emotion.label, emotion_score=user_emotion.score, contents=[]
+    )
 
     for index, score in zip(score_indices, sorted_scores):
         artist = candidate_lyrics["artists"][index]

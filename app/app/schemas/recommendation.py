@@ -12,6 +12,7 @@ class SongRecommendation(Song):
 class RecommendationResponse(BaseModel):
     topk: int
     emotion_label: str
+    emotion_score: float
     contents: List[SongRecommendation] = Field(default_factory=list)
 
     class Config:

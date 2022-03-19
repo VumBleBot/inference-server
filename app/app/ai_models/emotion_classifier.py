@@ -2,9 +2,11 @@ import json
 import os
 from functools import lru_cache
 from pathlib import Path
+from typing import Tuple
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from schemas.emotion import Emotion
 from transformers import AutoModel, BertTokenizerFast
 
@@ -37,10 +39,13 @@ class EmotionClassifier(nn.Module):
         assert os.path.exists(label_path), f"{label_path}가 존재하지 않습니다"
         self.idx2label = json.load(open(label_path, "r"))
 
-    def vector_to_label(self, emotion_vector: torch.Tensor) -> str:
+    def vector_to_label_n_score(self, emotion_vector: torch.Tensor) -> Tuple[str, float]:
         """emotion_vector의 label을 출력합니다"""
-        idx = self.classifier(emotion_vector).detach().argmax(-1).cpu().item()
-        return self.idx2label[str(idx)]
+        logits = self.classifier(emotion_vector).detach()
+        idx = logits.argmax(-1).cpu().item()
+        label = self.idx2label[str(idx)]
+        score = torch.max(F.softmax(logits, dim=-1)).cpu().item()
+        return label, score
 
     def forward(self, inputs: str) -> torch.Tensor:
         """emotion vector를 return합니다"""
@@ -53,9 +58,9 @@ class EmotionClassifier(nn.Module):
     async def predict(self, input: str) -> Emotion:
         with torch.no_grad():
             input_vector = self.forward(input)
-            label = self.vector_to_label(input_vector)
+            label, score = self.vector_to_label_n_score(input_vector)
             input_vector = input_vector.detach().numpy()
-        return Emotion(label=label, vector=input_vector)
+        return Emotion(label=label, score=score, vector=input_vector)
 
 
 @lru_cache
