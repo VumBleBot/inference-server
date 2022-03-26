@@ -1,4 +1,3 @@
-
 class NoAdequateSearchResultException(Exception):
     msg: str
 
