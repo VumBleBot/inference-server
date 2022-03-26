@@ -65,7 +65,7 @@ class ElasticSearchRetriever(BaseRetriever):
     async def _request_search(self, index_name: str, query: dict, topk: int) -> List[int]:
         try:
             result = self.es_server.search(index=index_name, body=query, size=topk)
-            doc_indices = list(hit["_id"] for hit in result["hits"]["hits"])
+            doc_indices = [hit["_id"] for hit in result["hits"]["hits"]]
         except Exception as e:
             logging.error(str(e))
         return doc_indices
